@@ -67,9 +67,18 @@ export async function generateWeeklyPlan(cookDays: string[]) {
     const value = created.fields[day];
   
     // Skip WeekOf (it's not a linked record)
-    if (day === "WeekOf") {
-      readablePlan.fields[day] = value;
-      continue;
+    const readablePlan: {
+      fields: Record<string, any>;
+    } = {
+      fields: {},
+    };
+    
+    for (const day of Object.keys(created.fields)) {
+      const value = created.fields[day];
+    
+      if (day === "WeekOf") {
+        readablePlan.fields[day] = value;
+        continue;
     }
   
     const mealId = value?.[0];
