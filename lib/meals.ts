@@ -12,7 +12,7 @@ export async function fetchActiveMeals() {
     fields: r.fields,
   }));
 }
-export async function getMealById(id) {
+export async function getMealById(id: string) {
     const record = await base("Meals").find(id);
   
     return {
