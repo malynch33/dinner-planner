@@ -31,7 +31,7 @@ export async function generateWeeklyPlan(cookDays: string[]) {
 
   const monday = getCurrentWeekMonday();
 
-  const fields = {
+  const fields: Record<string, any> = {
     WeekOf: monday.toISOString().split("T")[0],
   };
 
