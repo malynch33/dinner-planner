@@ -9,10 +9,8 @@ function getCurrentWeekMonday() {
   const monday = new Date(now);
   const day = monday.getDay();
   const diff = day === 0 ? -6 : 1 - day;
-  
   monday.setDate(monday.getDate() + diff);
   monday.setHours(0, 0, 0, 0);
-
   return monday;
 }
 
@@ -35,15 +33,7 @@ export async function generateWeeklyPlan(cookDays: string[]) {
     WeekOf: monday.toISOString().split("T")[0],
   };
 
-  const days = [
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday",
-  ];
+  const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
   days.forEach((day, i) => {
     if (cookDays.includes(day)) {
@@ -58,36 +48,28 @@ export async function generateWeeklyPlan(cookDays: string[]) {
 
   const [created] = await base("WeeklyPlans").create([{ fields }]);
 
-  const readablePlan = {
+  // ✅ Single readablePlan declaration with proper typing
+  const readablePlan: { id: string; fields: Record<string, any> } = {
     id: created.id,
     fields: {},
   };
-  
+
   for (const day of Object.keys(created.fields)) {
     const value = created.fields[day];
-  
+
     // Skip WeekOf (it's not a linked record)
-    const readablePlan: {
-      fields: Record<string, any>;
-    } = {
-      fields: {},
-    };
-    
-    for (const day of Object.keys(created.fields)) {
-      const value = created.fields[day];
-    
-      if (day === "WeekOf") {
-        readablePlan.fields[day] = value;
-        continue;
+    if (day === "WeekOf") {
+      readablePlan.fields[day] = value;
+      continue;
     }
-  
+
     const mealId = value?.[0];
-  
+
     if (mealId) {
       const meal = await getMealById(mealId);
       readablePlan.fields[day] = [meal.fields.Name];
     }
   }
-  
+
   return readablePlan;
 }
